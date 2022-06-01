@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "Flask-Api-Mongo-Test"
+version = "0.1.0"
+description = ""
+authors = ["Christopher Okoro <christopherokoro007@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Flask-PyMongo = "^2.3.0"
+dnspython = "^2.2.1"
+Flask = "^2.1.2"
+typing-extensions = "^4.2.0"
+toml = "^0.10.2"
+PyYAML = "^6.0"
+pyrsistent = "^0.18.1"
+PyJWT = "1.7.1"
+pycparser = "^2.21"
+marshmallow = "^3.15.0"
+jsonschema = "^4.5.1"
+iniconfig = "^1.1.1"
+gunicorn = "^20.1.0"
+Flask-Cors = "^3.0.10"
+Flask-Bcrypt = "^1.0.1"
+python-dotenv = "^0.20.0"
+certifi = "^2022.5.18"
+flask-restx = "^0.5.1"
+coloredlogs = "^15.0.1"
+Flask-JWT-Extended = "^3.24.1"
+Werkzeug = "2.0.1"
+requests = "^2.27.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

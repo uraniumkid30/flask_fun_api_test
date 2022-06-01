@@ -41,13 +41,18 @@ class UserRegister(Resource):
         validity_result = validate_fields(request.json, user_registration_schema)
         if isinstance(validity_result, User):
             new_user_info = self.user_service.add_user(request.json)
-            new_user_obj: User = convert_to_model_obj_from_json(new_user_info, User)
-            res = user_schema.dump(new_user_obj)
+            if isinstance(new_user_info, str):
+                res = new_user_info
+                status = Status.HTTP_400_BAD_REQUEST
+            else:
+                new_user_obj: User = convert_to_model_obj_from_json(new_user_info, User)
+                res = user_schema.dump(new_user_obj)
+                status = Status.HTTP_201_CREATED
             return {
                 "status": "success",
                 "res": res,
                 "message": "ok",
-            }, Status.HTTP_201_CREATED
+            }, status
         return validity_result
 
 

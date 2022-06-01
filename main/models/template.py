@@ -2,7 +2,7 @@ import mongoengine as me
 
 
 class Template(me.Document):
-    id = me.StringField(
+    _id = me.StringField(
         primary_key=True,
     )
     template_name = me.StringField()

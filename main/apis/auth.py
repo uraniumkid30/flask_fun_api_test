@@ -9,10 +9,17 @@ from flask_jwt_extended import (
     jwt_required,
 )
 
-from utilities.utils import Utils
-from main.services.blacklist_helpers import BlacklistHelper
+
+from main.models.user import User
+from utilities.utils import Utils, Status
+
+from main.serializers.user import user_schema
 from main.services.jwt_service import JWTService
 from main.services.user_service import UserService
+from main.serializers.auth import user_registration_schema
+from main.serializers.error_manager import validate_fields
+from main.services.blacklist_helpers import BlacklistHelper
+from main.services.utils import convert_to_model_obj_from_json
 from main.api_namespaces.auth import api, user_register_model, user_login_model
 
 
@@ -31,26 +38,17 @@ class UserRegister(Resource):
     @api.expect(user_register_model, validate=True)
     def post(self):
         """Register new User"""
-        print(request.json, "body")
-        if "email" not in request.json or request.json["email"] == "":
-            return api.abort(
-                400, "Email should not be empty.", status="error", status_code=400
-            )
-
-        if "password" not in request.json or request.json["password"] == "":
-            return api.abort(
-                400, "Password should not be empty.", status="error", status_code=400
-            )
-
-        request.json["password"] = self.jwt_service.hash_password(
-            request.json["password"]
-        )
-
-        res = self.user_service.add_user(request.json)
-        if "password" in res:
-            del res["password"]
-
-        return {"status": "success", "res": res, "message": "ok"}, 201
+        validity_result = validate_fields(request.json, user_registration_schema)
+        if isinstance(validity_result, User):
+            new_user_info = self.user_service.add_user(request.json)
+            new_user_obj: User = convert_to_model_obj_from_json(new_user_info, User)
+            res = user_schema.dump(new_user_obj)
+            return {
+                "status": "success",
+                "res": res,
+                "message": "ok",
+            }, Status.HTTP_201_CREATED
+        return validity_result
 
 
 @api.route("/auth/login")
@@ -67,7 +65,6 @@ class UserLogin(Resource):
     @api.expect(user_login_model, validate=True)
     def post(self):
         """User login API"""
-
         email, password = request.json["email"], request.json["password"]
 
         request.json["password"] = self.jwt_service.hash_password(password)

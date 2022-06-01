@@ -2,7 +2,7 @@ import mongoengine as me
 
 
 class User(me.Document):
-    id = me.StringField(
+    _id = me.StringField(
         primary_key=True,
     )
     first_name = me.StringField()

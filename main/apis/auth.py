@@ -82,10 +82,13 @@ class UserLogin(Resource):
                 "refresh": create_refresh_token(identity=email),
             }
             self.user_service.save_tokens(user["tokens"])
-            message, status_code = "Login successful.", 200
+            message, status_code = "Login successful.", Status.HTTP_200_OK
         else:
             user = []
-            message, status_code = "Email or Password is wrong.", 401
+            message, status_code = (
+                "Email or Password is wrong.",
+                Status.HTTP_401_UNAUTHORIZED,
+            )
 
         return {"status": "success", "res": user, "message": message}, status_code
 
@@ -124,4 +127,4 @@ class TokenRefresh(Resource):
 
         self.user_service.save_tokens(access_token)
 
-        return {"status": "success", "access_token": access_token}, 200
+        return {"status": "success", "access_token": access_token}, Status.HTTP_200_OK

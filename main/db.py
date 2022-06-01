@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask import current_app as app
+from utilities.utils import Singleton
 
 
 def get_or_create_collection(function):
@@ -38,7 +39,7 @@ def get_or_create_collection(function):
     return wrapper
 
 
-class MongoDB:
+class MongoDB(metaclass=Singleton):
     def __init__(self):
         self.log = app.config["log"]
         self.db_log = logging.getLogger("mongodb")

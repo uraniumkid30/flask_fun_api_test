@@ -1,8 +1,11 @@
+from collections import OrderedDict
 from flask_restx import Namespace, Resource, fields
 
 from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
+from utilities.utils import Status
+from main.serializers.user import user_schema
 from main.services.jwt_service import JWTService
 from main.services.user_service import UserService
 from main.api_namespaces.users import api, user_model
@@ -32,7 +35,9 @@ class User(Resource):
     def put(self, user_id):
         """Update User profile by _id"""
         if not user_id:
-            api.abort(400, "User _id is missing.", status="error")
+            api.abort(
+                Status.HTTP_400_BAD_REQUEST, "User _id is missing.", status="error"
+            )
 
         if "password" in request.json and request.json["password"] != "":
             request.json["password"] = self.jwt_service.hash_password(
@@ -47,14 +52,20 @@ class User(Resource):
     def delete(self, user_id):
         """Delete User based on user_id"""
         if not user_id:
-            api.abort(400, f"User _id is required.", status="error")
+            api.abort(
+                Status.HTTP_400_BAD_REQUEST, f"User _id is required.", status="error"
+            )
 
         res, msg = self.user_service.delete_user(user_id)
 
         if res:
-            return {"status": "success", "data": res, "message": msg}, 200
+            return {
+                "status": "success",
+                "data": res,
+                "message": msg,
+            }, Status.HTTP_200_OK
         else:
-            return api.abort(400, msg, status="error")
+            return api.abort(Status.HTTP_400_BAD_REQUEST, msg, status="error")
 
 
 @api.route("/users")
@@ -69,6 +80,6 @@ class UserList(Resource):
     @jwt_required
     def get(self):
         """Get list of users"""
-        users = self.user_service.user_list()
-
-        return {"status": "success", "res": users}, 200
+        users_info = self.user_service.user_list()
+        users = list(map(OrderedDict, user_schema.dump(users_info, many=True)))
+        return {"status": "success", "res": users}, Status.HTTP_200_OK

@@ -8,7 +8,7 @@ class TemplateSchema(ModelSchema):
     class Meta:
         model = Template
         exclude = [
-            "id",
+            "_id",
         ]
 
 

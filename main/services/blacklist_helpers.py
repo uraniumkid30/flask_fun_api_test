@@ -3,10 +3,11 @@ from datetime import datetime
 from flask_jwt_extended import decode_token
 
 from main.db import MongoDB
+from utilities.utils import Status
 
 
 class BlacklistHelper:
-    """ Helper file to handle the blacklist tokens. """
+    """Helper file to handle the blacklist tokens."""
 
     def __init__(self):
         super(BlacklistHelper, self).__init__()
@@ -44,9 +45,9 @@ class BlacklistHelper:
             # make token.revoked = False and save it into database
             for t in token:
                 del t["expires"]
-            return (200, "Successfully logged out.")
+            return (Status.HTTP_200_OK, "Successfully logged out.")
         else:
-            return (404, "Token not found.")
+            return (Status.HTTP_404_NOT_FOUND, "Token not found.")
 
     def _epoch_utc_to_datetime(self, epoch_utc):
         """

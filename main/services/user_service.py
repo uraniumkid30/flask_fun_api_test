@@ -2,6 +2,7 @@ from flask import current_app as app
 
 from utilities.utils import Utils
 from main.db import MongoDB
+from utilities.utils import Status
 from main.services.blacklist_helpers import BlacklistHelper
 
 
@@ -19,8 +20,6 @@ class UserService:
     def user_list(self):
         users = self.mongo.find(self.collection)
         if users:
-            for user in users:
-                del user["password"]
             self.log.info(f"Found {len(users)} users")
             return users
         else:
@@ -46,10 +45,10 @@ class UserService:
         if res:
             del res["password"]
             self.log.info(f"Found User {user_id}")
-            return ("success", res, "ok", 200)
+            return ("success", res, "ok", Status.HTTP_200_OK)
         else:
             self.log.error(f"Couldnt Find User {user_id}")
-            return ("error", [], "Something went wrong.", 400)
+            return ("error", [], "Something went wrong.", Status.HTTP_400_BAD_REQUEST)
 
     def update_user(self, _id, user_obj):
         user = self.mongo.find(
@@ -62,10 +61,10 @@ class UserService:
             if res:
                 del res_obj["password"]
                 self.log.info(f"Update Successful")
-                return ("success", res_obj, "ok", 200)
+                return ("success", res_obj, "ok", Status.HTTP_200_OK)
             else:
                 self.log.error(f"Update Failed")
-                return ("error", "", "Something went wrong.", 400)
+                return ("error", "", "Something went wrong.", Status.HTTP_400_BAD_REQUEST)
         else:
             self.log.info(
                 f"Update unsuccessful because email {user_obj['email']} already exists."
@@ -74,7 +73,7 @@ class UserService:
                 "error",
                 "",
                 f'Email {user_obj["email"]} address already in use.',
-                400,
+                Status.HTTP_400_BAD_REQUEST,
             )
 
     def delete_user(self, user_id):

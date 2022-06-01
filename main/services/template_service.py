@@ -1,6 +1,7 @@
 from bson.objectid import ObjectId
 
 from main.db import MongoDB
+from utilities.utils import Status
 
 
 class TemplateService:
@@ -19,10 +20,14 @@ class TemplateService:
             return (
                 self.mongo.save(self.collection, template_obj),
                 "Successfully created.",
-                200,
+                Status.HTTP_200_OK,
             )
         else:
-            return ("ok", "template already added to the library.", 400)
+            return (
+                "ok",
+                "template already added to the library.",
+                Status.HTTP_400_BAD_REQUEST,
+            )
 
     def template_list(self):
         return self.mongo.find(self.collection)
@@ -35,8 +40,8 @@ class TemplateService:
         res, update_count = self.mongo.update(self.collection, template_id, condition)
 
         if res:
-            return ("success", res, "ok", 200)
-        return ("error", "", "Something went wrong.", 400)
+            return ("success", res, "ok", Status.HTTP_200_OK)
+        return ("error", "", "Something went wrong.", Status.HTTP_400_BAD_REQUEST)
 
     def get_template(self, template_id):
         condition = {"_id": ObjectId(template_id)}

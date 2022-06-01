@@ -1,10 +1,11 @@
 from flask import current_app as app, jsonify
+from utilities.utils import Status
 
 # from app.auth.blacklist_helper import is_token_revoked
 
 
 class JWTService:
-    """ doc str """
+    """doc str"""
 
     def __init__(self):
         super(JWTService, self).__init__()
@@ -27,7 +28,7 @@ class JWTService:
         def expired_token_callback():
             return (
                 jsonify({"msg": "The token has expired", "error": "token_expired"}),
-                401,
+                Status.HTTP_401_UNAUTHORIZED,
             )
 
         @jwt.invalid_token_loader
@@ -36,7 +37,7 @@ class JWTService:
                 jsonify(
                     {"msg": "Signature verification failed", "error": "invalid_token"}
                 ),
-                401,
+                Status.HTTP_401_UNAUTHORIZED,
             )
 
         @jwt.unauthorized_loader
@@ -48,7 +49,7 @@ class JWTService:
                         "error": "authorization_required",
                     }
                 ),
-                401,
+                Status.HTTP_401_UNAUTHORIZED,
             )
 
         @jwt.needs_fresh_token_loader
@@ -57,7 +58,7 @@ class JWTService:
                 jsonify(
                     {"msg": "The token is not fresh", "error": "fresh_token_required"}
                 ),
-                401,
+                Status.HTTP_401_UNAUTHORIZED,
             )
 
         @jwt.revoked_token_loader
@@ -66,7 +67,7 @@ class JWTService:
                 jsonify(
                     {"msg": "The token has been revoked", "error": "token_revoked"}
                 ),
-                401,
+                Status.HTTP_401_UNAUTHORIZED,
             )
 
 

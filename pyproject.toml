@@ -28,6 +28,7 @@ coloredlogs = "^15.0.1"
 Flask-JWT-Extended = "^3.24.1"
 Werkzeug = "2.0.1"
 requests = "^2.27.1"
+marshmallow-mongoengine = "^0.30.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

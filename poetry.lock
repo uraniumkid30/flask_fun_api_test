@@ -339,6 +339,29 @@ lint = ["mypy (==0.940)", "flake8 (==4.0.1)", "flake8-bugbear (==22.1.11)", "pre
 tests = ["pytest", "pytz", "simplejson"]
 
 [[package]]
+name = "marshmallow-mongoengine"
+version = "0.30.2"
+description = "Mongoengine integration with the marshmallow (de)serialization library"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+marshmallow = ">=3.0.0b7"
+mongoengine = ">=0.9.0"
+
+[[package]]
+name = "mongoengine"
+version = "0.24.1"
+description = "MongoEngine is a Python Object-Document Mapper for working with MongoDB."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pymongo = ">=3.4,<5.0"
+
+[[package]]
 name = "more-itertools"
 version = "8.13.0"
 description = "More routines for operating on iterables, beyond itertools"
@@ -579,7 +602,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "10be8f746b491acdfbe55d74b0338aedefa65f950852c380d95c65b12cd22b47"
+content-hash = "28a0cbff1ba9c53ea4d367f16b6734d166c8417a2f4c742b9bfbc05340ba5717"
 
 [metadata.files]
 aniso8601 = [
@@ -783,6 +806,13 @@ markupsafe = [
 marshmallow = [
     {file = "marshmallow-3.15.0-py3-none-any.whl", hash = "sha256:ff79885ed43b579782f48c251d262e062bce49c65c52412458769a4fb57ac30f"},
     {file = "marshmallow-3.15.0.tar.gz", hash = "sha256:2aaaab4f01ef4f5a011a21319af9fce17ab13bf28a026d1252adab0e035648d5"},
+]
+marshmallow-mongoengine = [
+    {file = "marshmallow-mongoengine-0.30.2.tar.gz", hash = "sha256:64857b86a4f2e2d8ff096eab2fa244562817c9e0bb7cda156a0bb85d3dbcbbcf"},
+]
+mongoengine = [
+    {file = "mongoengine-0.24.1-py3-none-any.whl", hash = "sha256:68878b65bcb3751debcba4342180a180161cdb5f46525027e622ad081dd44fac"},
+    {file = "mongoengine-0.24.1.tar.gz", hash = "sha256:01baac85f408f5eefb6195c0afeae631e7fc6fab5cb221a7b46646f94227d6da"},
 ]
 more-itertools = [
     {file = "more-itertools-8.13.0.tar.gz", hash = "sha256:a42901a0a5b169d925f6f217cd5a190e32ef54360905b9c39ee7db5313bfec0f"},

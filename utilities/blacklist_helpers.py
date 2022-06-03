@@ -1,12 +1,14 @@
 from datetime import datetime
-
+from flask import current_app as app
 from database import TokenBlacklist
 from exceptions import TokenNotFound
 from flask_jwt_extended import decode_token
 
-from main.db import MongoDB
+from main.databases.mongo_db import MongoDB
+from main.databases.db_abstraction import Nosql
 
-db = MongoDB()
+# db: Nosql = MongoDB()
+db: app.config["sql_type"] = app.config["db_engine_obj"]
 
 
 def _epoch_utc_to_datetime(epoch_utc):

@@ -23,7 +23,7 @@ authorizations = {"token": {"type": "apiKey", "in": "header", "name": "Authoriza
 
 config_name = os.getenv("FLASK_CONFIG")
 app = create_app(config_name)
-
+VERSION = "v1"
 
 api = Api(
     app,
@@ -38,9 +38,9 @@ app.config["jwt"]._set_error_handler_callbacks(api)
 app.config["ROOT_DIR"] = pathlib.Path(__file__).parent.absolute()
 
 # Endpoints
-api.add_namespace(Auth, path="/v1")
-api.add_namespace(User, path="/v1")
-api.add_namespace(Template, path="/v1")
+api.add_namespace(Auth, path=f"/{VERSION}")
+api.add_namespace(User, path=f"/{VERSION}")
+api.add_namespace(Template, path=f"/{VERSION}")
 
 # Run Server
 if __name__ == "__main__":

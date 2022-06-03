@@ -21,7 +21,9 @@ from configuration.logging import (
     DEFAULT_COLORED_LOGS_LEVEL_STYLES,
     DEFAULT_COLORED_LOGS_FIELD_STYLES,
 )
-from .db import MongoDB
+from .databases.mongo_db import MongoDB
+from .databases.db_abstraction import Nosql
+from .db import DB_ENGINES, SQL_TYPES
 
 
 def create_app(config_name):
@@ -32,9 +34,7 @@ def create_app(config_name):
     coloredlogs.DEFAULT_FIELD_STYLES = DEFAULT_COLORED_LOGS_FIELD_STYLES
     coloredlogs.install(level="DEBUG")
     app = Flask(__name__, instance_relative_config=True)
-    # app.config.from_object("configuration.settings.DevelopmentConfig")
     app.config.from_object(app_config[config_name])
-    # app.config.from_pyfile("config.py")
 
     app.config["log"] = log
 
@@ -47,20 +47,23 @@ def create_app(config_name):
     app.config.SWAGGER_UI_JSONEDITOR = True
     app.config.SWAGGER_UI_DOC_EXPANSION = "none"
 
+    sql_type: str = app.config["SQL_CATEGORY"]
+    db_engine: str = app.config["DB_ENGINE"]
+    SqlType = SQL_TYPES.get(sql_type, str)
+    DbEngine = DB_ENGINES.get(db_engine, str)
     with app.app_context():
-        db = MongoDB()
+        # db = MongoDB()
+        # db: Nosql = MongoDB()
+        db: SqlType = DbEngine()
+    app.config["db_engine_obj"] = db
+    app.config["sql_type"] = SqlType
+    app.config["db_engine"] = DbEngine
 
     @jwt.token_in_blacklist_loader
     def check_if_token_in_blacklist(decrypted_token):
         blacklist = set()
         jti = decrypted_token["jti"]
         return jti in blacklist
-
-    # @app.route("/")
-    # def hello_world():
-    #     # render home template
-    #     # logger = logging.getLogger("apps")
-    #     return "Hello, World!"
 
     # ensure the instance folder exists
     try:

@@ -1,6 +1,7 @@
 from flask import current_app as app
 
 from utilities.utils import Utils
+from main.services.jwt_service import JWTService
 from main.databases.mongo_db import MongoDB
 from main.databases.db_abstraction import Nosql
 from utilities.utils import Status
@@ -15,6 +16,7 @@ class UserService:
         self.collection = "users"
         self.blacklist = BlacklistHelper()
         self.utils = Utils()
+        self.jwt = JWTService()
         self.db_client: app.config["sql_type"] = app.config["db_engine_obj"]
         # self.db_client: Nosql = MongoDB()
         self.log = app.config["log"]
@@ -34,10 +36,15 @@ class UserService:
             collection=self.collection, condition={"email": user_obj["email"]}
         )
         if not user:
+            hashed_password = self.jwt.hash_password(user_obj["password"])
+            password = user_obj["password"]
+            user_obj["password"] = hashed_password
             self.log.info(f"About to add user with data {user_obj}")
-            return self.db_client.insert_record_into_collection(
+            new_user_obj = self.db_client.insert_record_into_collection(
                 self.collection, user_obj
             )
+            new_user_obj["password"] = password
+            return new_user_obj
         else:
             msg = f'User with {user_obj["email"]} already existed.'
             self.log.warning(msg)

@@ -2,7 +2,9 @@ from datetime import datetime
 
 from flask_jwt_extended import decode_token
 
-from main.db import MongoDB
+from flask import current_app as app
+from main.databases.mongo_db import MongoDB
+from main.databases.db_abstraction import Nosql
 from utilities.utils import Status
 
 
@@ -12,7 +14,8 @@ class BlacklistHelper:
     def __init__(self):
         super(BlacklistHelper, self).__init__()
         self.collection = "blacklist"
-        self.mongo = MongoDB()
+        self.db_client: app.config["sql_type"] = app.config["db_engine_obj"]
+        # self.db_client: Nosql = MongoDB()
 
     def add_token_to_database(self, encoded_access_token, identity_claim):
         """
@@ -35,11 +38,11 @@ class BlacklistHelper:
             "revoked": revoked,
         }
 
-        return self.mongo.save(self.collection, token_data)
+        return self.db_client.insert_record_into_collection(self.collection, token_data)
 
     def revoke_token(self, user):
         condition = {"user_identity": user}
-        token = self.mongo.find(self.collection, condition)
+        token = self.db_client.find_record(self.collection, condition)
         if token:
             # token.revoked = True
             # make token.revoked = False and save it into database

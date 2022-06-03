@@ -1,7 +1,8 @@
 from flask import current_app as app
 
 from utilities.utils import Utils
-from main.db import MongoDB
+from main.databases.mongo_db import MongoDB
+from main.databases.db_abstraction import Nosql
 from utilities.utils import Status
 from main.services.blacklist_helpers import BlacklistHelper
 
@@ -14,11 +15,12 @@ class UserService:
         self.collection = "users"
         self.blacklist = BlacklistHelper()
         self.utils = Utils()
-        self.mongo = MongoDB()
+        self.db_client: app.config["sql_type"] = app.config["db_engine_obj"]
+        # self.db_client: Nosql = MongoDB()
         self.log = app.config["log"]
 
     def user_list(self):
-        users = self.mongo.find(self.collection)
+        users = self.db_client.find_record(self.collection)
         if users:
             self.log.info(f"Found {len(users)} users")
             return users
@@ -28,12 +30,14 @@ class UserService:
 
     def add_user(self, user_obj):
         """user_obj - user object"""
-        user = self.mongo.find(
+        user = self.db_client.find_record(
             collection=self.collection, condition={"email": user_obj["email"]}
         )
         if not user:
             self.log.info(f"About to add user with data {user_obj}")
-            return self.mongo.save(self.collection, user_obj)
+            return self.db_client.insert_record_into_collection(
+                self.collection, user_obj
+            )
         else:
             msg = f'User with {user_obj["email"]} already existed.'
             self.log.warning(msg)
@@ -41,7 +45,7 @@ class UserService:
 
     def get_user(self, user_id):
         """Get User profile by id. ex _id:"""
-        res = self.mongo.find_by_id(collection=self.collection, _id=user_id)
+        res = self.db_client.find_record_by_id(collection=self.collection, _id=user_id)
         if res:
             del res["password"]
             self.log.info(f"Found User {user_id}")
@@ -51,20 +55,27 @@ class UserService:
             return ("error", [], "Something went wrong.", Status.HTTP_400_BAD_REQUEST)
 
     def update_user(self, _id, user_obj):
-        user = self.mongo.find(
+        user = self.db_client.find_record(
             collection=self.collection, condition={"email": user_obj["email"]}
         )
         if not user:
             query = {"$set": user_obj}
             self.log.info(f"About to perform User Update with {_id, user_obj}")
-            res, res_obj = self.mongo.update(self.collection, _id, query)
+            res, res_obj = self.db_client.update_record_by_id(
+                self.collection, _id, query
+            )
             if res:
                 del res_obj["password"]
                 self.log.info(f"Update Successful")
                 return ("success", res_obj, "ok", Status.HTTP_200_OK)
             else:
                 self.log.error(f"Update Failed")
-                return ("error", "", "Something went wrong.", Status.HTTP_400_BAD_REQUEST)
+                return (
+                    "error",
+                    "",
+                    "Something went wrong.",
+                    Status.HTTP_400_BAD_REQUEST,
+                )
         else:
             self.log.info(
                 f"Update unsuccessful because email {user_obj['email']} already exists."
@@ -78,14 +89,18 @@ class UserService:
 
     def delete_user(self, user_id):
         self.log.info(f"About to delete User {user_id}")
-        return self.mongo.delete(collection=self.collection, _id=user_id)
+        return self.db_client.delete_record_by_id(
+            collection=self.collection, _id=user_id
+        )
 
     def login(self, email):
         """email as input"""
-        user = self.mongo.find(collection=self.collection, condition={"email": email})
+        user = self.db_client.find_record(
+            collection=self.collection, condition={"email": email}
+        )
         if user:
             user = user[0]
-            self.log.info(f"User {email} has logged in")
+            self.log.info(f"Found User with email {email} to logged in")
             return user
         else:
             return None

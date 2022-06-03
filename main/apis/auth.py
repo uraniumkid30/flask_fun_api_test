@@ -23,7 +23,7 @@ from main.services.utils import convert_to_model_obj_from_json
 from main.api_namespaces.auth import api, user_register_model, user_login_model
 
 
-@api.route("/auth/register")
+@api.route("/register")
 class UserRegister(Resource):
     """docstring for UserRegister."""
 
@@ -56,7 +56,7 @@ class UserRegister(Resource):
         return validity_result
 
 
-@api.route("/auth/login")
+@api.route("/login")
 class UserLogin(Resource):
     """docstring for UserLogin."""
 

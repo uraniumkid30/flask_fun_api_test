@@ -11,7 +11,7 @@ from main.services.template_service import TemplateService
 from main.api_namespaces.template import api, template_model, update_template_model
 
 
-@api.route("/template")
+@api.route("template")
 class NewTemplate(Resource):
     """docstring for NewTemplate."""
 
@@ -42,7 +42,7 @@ class NewTemplate(Resource):
         return {"status": "success", "res": templates}, Status.HTTP_200_OK
 
 
-@api.route("/template/<string:template_id>")
+@api.route("template/<string:template_id>")
 class Template(Resource):
     """docstring for Template."""
 

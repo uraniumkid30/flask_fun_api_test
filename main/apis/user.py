@@ -11,7 +11,7 @@ from main.services.user_service import UserService
 from main.api_namespaces.users import api, user_model
 
 
-@api.route("/user/<user_id>")
+@api.route("user/<user_id>")
 class User(Resource):
     """docstring for User."""
 
@@ -68,7 +68,7 @@ class User(Resource):
             return api.abort(Status.HTTP_400_BAD_REQUEST, msg, status="error")
 
 
-@api.route("/users")
+@api.route("users")
 class UserList(Resource):
     """docstring for UserList."""
 
